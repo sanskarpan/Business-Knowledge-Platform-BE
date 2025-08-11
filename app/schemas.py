@@ -44,7 +44,7 @@ class Document(DocumentBase):
 
 class DocumentDetail(Document):
     content: Optional[str] = None
-    metadata: Optional[str] = None
+    doc_metadata: Optional[str] = None
 
 # Chat schemas
 class ChatSessionCreate(BaseModel):
