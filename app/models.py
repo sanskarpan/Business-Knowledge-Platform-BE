@@ -31,7 +31,7 @@ class Document(Base):
     file_path = Column(String, nullable=False)
     file_size = Column(Integer)
     file_type = Column(String)
-    metadata = Column(Text)  # JSON string
+    doc_metadata = Column(Text)  # JSON string
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     owner = relationship("User", back_populates="documents")
