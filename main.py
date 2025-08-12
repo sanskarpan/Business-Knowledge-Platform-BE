@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Middleware
+from fastapi import FastAPI, middleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 from app.database import engine, Base
-from app.routers import auth, documents, chat, search, analytics
+from app.routers import auth, documents, chat, search
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -34,7 +34,6 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(documents.router, prefix="/api/documents", tags=["documents"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 app.include_router(search.router, prefix="/api/search", tags=["search"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 
 @app.get("/")
 async def root():
