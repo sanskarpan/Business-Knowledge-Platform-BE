@@ -7,31 +7,31 @@
 
 ### **Phase 1: Foundation & Setup**
 #### Backend Setup
-- [ ] Initialize FastAPI project structure
-- [ ] Set up virtual environment and dependencies
-- [ ] Configure PostgreSQL database connection
-- [ ] Set up Pinecone vector database
-- [ ] Create basic project structure and folders
-- [ ] Configure environment variables (.env file)
-- [ ] Set up basic logging and error handling
+- [x] Initialize FastAPI project structure
+- [x] Set up virtual environment and dependencies
+- [x] Configure PostgreSQL database connection
+- [x] Set up Pinecone vector database
+- [x] Create basic project structure and folders
+- [x] Configure environment variables (.env file)
+- [x] Set up basic logging and error handling
 
 #### Frontend Setup
-- [ ] Initialize React project with Vite/Create React App
-- [ ] Install Tailwind CSS
-- [ ] Set up Redux/Context API for state management
-- [ ] Create basic folder structure (components, pages, hooks, utils)
-- [ ] Set up Axios for API calls
-- [ ] Configure routing with React Router
+- [x] Initialize React project with Vite/Create React App
+- [x] Install Tailwind CSS
+- [x] Set up Redux/Context API for state management
+- [x] Create basic folder structure (components, pages, hooks, utils)
+- [x] Set up Axios for API calls
+- [x] Configure routing with React Router
 
 #### Database Schema
-- [ ] Create users table
-- [ ] Create documents table
-- [ ] Create document_chunks table
-- [ ] Create chat_sessions table
-- [ ] Create chat_messages table
-- [ ] Create search_queries table
-- [ ] Create user_activities table
-- [ ] Set up database migrations
+- [x] Create users table
+- [x] Create documents table
+- [x] Create document_chunks table
+- [x] Create chat_sessions table
+- [x] Create chat_messages table
+- [x] Create search_queries table
+- [x] Create user_activities table
+- [x] Set up database migrations
 
 ### **Phase 2: Authentication & User Management**
 #### Backend
