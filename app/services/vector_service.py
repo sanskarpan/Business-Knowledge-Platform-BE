@@ -5,6 +5,8 @@ from openai import OpenAI
 from app.config import settings
 
 class VectorService:
+    # Guard to ensure index creation is attempted only once per process
+    _index_ensured: bool = False
     def __init__(self):
         try:
             # Initialize Pinecone with new API
@@ -15,10 +17,12 @@ class VectorService:
             
             # Index name
             self.index_name = "knowledge-platform"
-            
-            # Create index if it doesn't exist
-            self._ensure_index_exists()
-            
+
+            # Ensure index only once per process
+            if not VectorService._index_ensured:
+                self._ensure_index_exists()
+                VectorService._index_ensured = True
+
             # Get index
             self.index = self.pc.Index(self.index_name)
             
