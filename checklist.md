@@ -86,7 +86,7 @@
 
 #### Frontend
 - [x] Create ChatInterface component
-- [ ] Implement real-time messaging with WebSockets/SSE (non-streaming implemented)
+- [x] Implement real-time messaging with SSE fallback (basic)
 - [x] Add typing indicators
 - [x] Create conversation history display
 - [x] Implement source citation display
