@@ -103,7 +103,7 @@
 
 #### Frontend
 - [x] Create SearchInterface component
-- [ ] Implement advanced search with filters (basic options only)
+- [x] Implement advanced search with filters (type, date range)
 - [x] Create UserDashboard component
 - [x] Add analytics visualizations
 - [ ] Create usage reports
@@ -116,6 +116,9 @@
 - [ ] Accessibility improvements (WCAG 2.1 AA)
 - [ ] UI/UX enhancements
 - [ ] Settings panel implementation
+
+#### Additional
+- [x] Add Profile page (basic) to view user info
 
 #### Testing & Documentation
 - [ ] Write unit tests for critical backend functions (auth, documents, search)
