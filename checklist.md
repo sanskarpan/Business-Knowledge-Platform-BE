@@ -35,96 +35,95 @@
 
 ### **Phase 2: Authentication & User Management**
 #### Backend
-- [ ] Implement user registration endpoint
-- [ ] Implement user login endpoint
-- [ ] Set up JWT authentication
-- [ ] Create password hashing utilities
-- [ ] Implement user profile endpoint
-- [ ] Add authentication middleware
+- [x] Implement user registration endpoint (`POST /api/auth/register`)
+- [x] Implement user login endpoint (`POST /api/auth/login`)
+- [x] Set up JWT authentication (bearer token)
+- [x] Create password hashing utilities (bcrypt via passlib)
+- [x] Implement user profile endpoint (`GET /api/auth/profile`)
+- [x] Add authentication middleware (dependency `get_current_user`)
 
 #### Frontend
-- [ ] Create Login component
-- [ ] Create Registration component
-- [ ] Create AuthContext for user state
-- [ ] Implement protected routes
-- [ ] Add login/logout functionality
+- [x] Create Login component
+- [x] Create Registration component
+- [x] Create AuthContext for user state
+- [x] Implement protected routes
+- [x] Add login/logout functionality
 - [ ] Create user profile page
 
 ### **Phase 3: Document Management System**
 #### Backend
-- [ ] Implement file upload endpoint (POST /api/documents/upload)
-- [ ] Add file validation (type, size limits)
-- [ ] Set up file storage (local/cloud)
-- [ ] Implement document listing endpoint (GET /api/documents)
-- [ ] Implement document retrieval endpoint (GET /api/documents/{id})
-- [ ] Implement document deletion endpoint (DELETE /api/documents/{id})
-- [ ] Add metadata extraction (filename, size, upload date)
-- [ ] Implement document content extraction (PDF, DOCX, TXT, MD)
-- [ ] Set up document chunking for vector storage
-- [ ] Create vector embeddings and store in Pinecone
+- [x] Implement file upload endpoint (POST /api/documents/upload)
+- [x] Add file validation (type, size limits)
+- [x] Set up file storage (local)
+- [x] Implement document listing endpoint (GET /api/documents)
+- [x] Implement document retrieval endpoint (GET /api/documents/{id})
+- [x] Implement document deletion endpoint (DELETE /api/documents/{id})
+- [x] Add metadata extraction (filename, size, upload date)
+- [x] Implement document content extraction (PDF, DOCX, TXT, MD, basic image OCR if available)
+- [x] Set up document chunking for vector storage
+- [x] Create vector embeddings and store in Pinecone
 
 #### Frontend
-- [ ] Create DocumentUploader component with drag-and-drop
-- [ ] Add upload progress indicators
-- [ ] Create DocumentLibrary component
-- [ ] Implement document search and filtering
-- [ ] Add document preview capabilities
-- [ ] Create document management interface
-- [ ] Add batch upload functionality
-- [ ] Implement file type validation on frontend
+- [x] Create DocumentUploader component with drag-and-drop
+- [x] Add upload progress indicators
+- [x] Create DocumentLibrary component
+- [x] Implement document search and filtering (client-side)
+- [x] Add document preview capabilities
+- [x] Create document management interface
+- [x] Add batch upload functionality
+- [x] Implement file type validation on frontend
 
 ### **Phase 4: AI Integration & Chat Interface**
 #### Backend
-- [ ] Set up OpenAI/Anthropic API integration
-- [ ] Implement knowledge retrieval endpoint (POST /api/knowledge/ask)
-- [ ] Create chat session management (POST /api/chat/sessions)
-- [ ] Implement chat message endpoint (POST /api/chat/message)
-- [ ] Add conversation history retrieval (GET /api/chat/history/{session_id})
-- [ ] Implement context retrieval from vector database
-- [ ] Add source citation functionality
-- [ ] Set up streaming responses
-- [ ] Implement similar document search (GET /api/knowledge/similar/{document_id})
+- [x] Set up OpenAI API integration (responses, embeddings)
+- [x] Create chat session management (POST /api/chat/sessions, GET /api/chat/sessions)
+- [x] Implement chat message endpoint (POST /api/chat/sessions/{id}/messages)
+- [x] Add conversation history retrieval (GET /api/chat/sessions/{id}/messages)
+- [x] Implement context retrieval from vector database (Pinecone)
+- [x] Add source citation functionality (chunk sources returned)
+- [ ] Set up streaming responses (SSE placeholder; needs production-grade implementation)
+- [x] Implement similar document search (GET /api/search/similar/{document_id})
 
 #### Frontend
-- [ ] Create ChatInterface component
-- [ ] Implement real-time messaging with WebSockets/SSE
-- [ ] Add typing indicators
-- [ ] Create conversation history display
-- [ ] Implement source citation display
-- [ ] Add conversation memory across sessions
+- [x] Create ChatInterface component
+- [ ] Implement real-time messaging with WebSockets/SSE (non-streaming implemented)
+- [x] Add typing indicators
+- [x] Create conversation history display
+- [x] Implement source citation display
+- [ ] Add conversation memory across sessions (persists per session; cross-session memory not implemented)
 - [ ] Create different chat modes (Q&A, research, summary)
 
 ### **Phase 5: Search & Analytics**
 #### Backend
-- [ ] Implement search endpoint (GET /api/search?q={query})
-- [ ] Create usage analytics endpoint (GET /api/analytics/usage)
-- [ ] Implement document analytics endpoint (GET /api/analytics/documents)
-- [ ] Add user activity tracking
-- [ ] Create performance metrics collection
+- [x] Implement search endpoint (GET /api/search?q={query})
+- [x] Create usage analytics endpoint (GET /api/analytics/usage)
+- [x] Implement document analytics endpoint (GET /api/analytics/documents)
+- [x] Add user activity tracking (uploads, searches, chat)
+- [x] Create performance metrics collection (basic)
 
 #### Frontend
-- [ ] Create SearchInterface component
-- [ ] Implement advanced search with filters
-- [ ] Create UserDashboard component
-- [ ] Add analytics visualizations
+- [x] Create SearchInterface component
+- [ ] Implement advanced search with filters (basic options only)
+- [x] Create UserDashboard component
+- [x] Add analytics visualizations
 - [ ] Create usage reports
-- [ ] Implement performance metrics display
+- [x] Implement performance metrics display (basic)
 
 ### **Phase 6: Polish & Deployment**
 #### Frontend Polish
 - [ ] Responsive design optimization
-- [ ] Loading states and error handling
+- [x] Loading states and error handling (basic)
 - [ ] Accessibility improvements (WCAG 2.1 AA)
 - [ ] UI/UX enhancements
 - [ ] Settings panel implementation
 
 #### Testing & Documentation
-- [ ] Write unit tests for critical backend functions
-- [ ] Test API endpoints
-- [ ] Frontend component testing
-- [ ] Create comprehensive README.md
-- [ ] Document API endpoints
-- [ ] Create architecture overview
+- [ ] Write unit tests for critical backend functions (auth, documents, search)
+- [ ] Test API endpoints (auth/docs/chat/search/analytics)
+- [ ] Frontend component testing (Auth, Documents, Chat, Search, Analytics)
+- [ ] Create comprehensive README.md (setup, env, run, deploy)
+- [ ] Document API endpoints (paths, payloads, examples)
+- [ ] Create architecture overview (diagram + data flow)
 - [ ] Document technology choices and LLM usage
 
 #### Deployment
@@ -204,13 +203,13 @@
 ## Success Metrics
 
 ### **Functional Requirements**
-- [ ] User can register and login successfully
-- [ ] User can upload documents (PDF, DOCX, TXT, MD)
-- [ ] User can view uploaded documents in library
-- [ ] User can ask questions about documents via chat
-- [ ] AI provides relevant responses with context from documents
-- [ ] User can search through documents
-- [ ] Basic analytics show usage patterns
+- [x] User can register and login successfully
+- [x] User can upload documents (PDF, DOCX, TXT, MD)
+- [x] User can view uploaded documents in library
+- [x] User can ask questions about documents via chat
+- [x] AI provides relevant responses with context from documents
+- [x] User can search through documents
+- [x] Basic analytics show usage patterns
 
 ### **Performance Requirements**
 - [ ] AI responses under 5 seconds
