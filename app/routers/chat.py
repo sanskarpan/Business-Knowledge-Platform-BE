@@ -272,7 +272,7 @@ async def stream_message(
             yield f"data: {json.dumps({'type': 'start', 'content': ''})}\n\n"
             
             # Process message (similar to above)
-            # Reuse generation but avoid duplicate DB writes by calling AI service directly
+            # Build context chunks and history
             query_embedding = await vector_service.create_embedding(message.content)
             relevant_chunks = []
             if query_embedding:
@@ -288,16 +288,14 @@ async def stream_message(
 
             recent = db.query(ChatMessage).filter(ChatMessage.session_id == session_id).order_by(ChatMessage.timestamp.desc()).limit(10).all()
             history = [{"role": m.role, "content": m.content} for m in reversed(recent)]
-            ai_data = await ai_service.generate_response(query=message.content, context_chunks=relevant_chunks, conversation_history=history)
-            text = ai_data.get("response", "")
-            # Tokenize by words to stream
-            words = text.split()
-            # Stream the response word by word for demonstration
-            
-            for word in words:
-                yield f"data: {json.dumps({'type': 'token', 'content': word + ' '})}\n\n"
-                await asyncio.sleep(0.1)  # Simulate streaming delay
-            
+
+            async for token in ai_service.stream_response(
+                query=message.content,
+                context_chunks=relevant_chunks,
+                conversation_history=history,
+            ):
+                yield f"data: {json.dumps({'type': 'token', 'content': token})}\n\n"
+
             yield f"data: {json.dumps({'type': 'end', 'sources': []})}\n\n"
             
         except Exception as e:

@@ -1,16 +1,19 @@
 import asyncio
 from typing import List, Dict, Optional, Any
 from openai import OpenAI
+from openai import AsyncOpenAI
 from app.config import settings
 
 class AIService:
     def __init__(self):
         try:
             self.client = OpenAI(api_key=settings.openai_api_key)
+            self.async_client = AsyncOpenAI(api_key=settings.openai_api_key)
             print("AI service initialized successfully")
         except Exception as e:
             print(f"AI service initialization failed: {e}")
             self.client = None
+            self.async_client = None
     
     async def generate_response(
         self, 
@@ -74,6 +77,58 @@ Instructions:
                 "response": "I apologize, but I'm having trouble generating a response right now. Please try again later.",
                 "error": str(e)
             }
+
+    async def stream_response(
+        self,
+        query: str,
+        context_chunks: List[str],
+        conversation_history: Optional[List[Dict]] = None,
+        model: str = "gpt-4",
+        temperature: float = 0.7,
+        max_tokens: int = 1000,
+    ):
+        """Async generator that yields streamed tokens from OpenAI."""
+        if not self.async_client:
+            data = await self.generate_response(query, context_chunks, conversation_history)
+            yield data.get("response", "")
+            return
+
+        context = "\n\n".join(context_chunks) if context_chunks else ""
+        messages = []
+        if conversation_history:
+            messages.extend(conversation_history[-10:])
+        system_message = f"""You are a helpful AI assistant that answers questions based on the provided context from documents.
+
+Context from documents:
+{context}
+
+Instructions:
+- Answer questions based on the provided context
+- If the context doesn't contain relevant information, say so clearly
+- Provide specific references to the source material when possible
+- Be concise but comprehensive
+- If asked about something not in the context, explain that you can only answer based on the provided documents
+"""
+        messages.insert(0, {"role": "system", "content": system_message})
+        messages.append({"role": "user", "content": query})
+
+        try:
+            stream = await self.async_client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=True,
+            )
+
+            async for chunk in stream:
+                delta = chunk.choices[0].delta
+                if delta and getattr(delta, "content", None):
+                    yield delta.content
+        except Exception as e:
+            print(f"Error streaming AI response: {e}")
+            data = await self.generate_response(query, context_chunks, conversation_history)
+            yield data.get("response", "")
     
     async def generate_summary(self, text: str, max_length: int = 200) -> str:
         """Generate a summary of the provided text"""
