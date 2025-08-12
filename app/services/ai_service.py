@@ -1,11 +1,16 @@
-import openai
 import asyncio
 from typing import List, Dict, Optional, Any
+from openai import OpenAI
 from app.config import settings
 
 class AIService:
     def __init__(self):
-        openai.api_key = settings.openai_api_key
+        try:
+            self.client = OpenAI(api_key=settings.openai_api_key)
+            print("AI service initialized successfully")
+        except Exception as e:
+            print(f"AI service initialization failed: {e}")
+            self.client = None
     
     async def generate_response(
         self, 
@@ -14,6 +19,12 @@ class AIService:
         conversation_history: Optional[List[Dict]] = None
     ) -> Dict[str, Any]:
         """Generate AI response using OpenAI GPT"""
+        if not self.client:
+            return {
+                "response": "AI service is not available. Please check your OpenAI API key.",
+                "error": "OpenAI client not initialized"
+            }
+        
         try:
             # Prepare context
             context = "\n\n".join(context_chunks) if context_chunks else ""
@@ -42,12 +53,11 @@ Instructions:
             
             # Generate response
             response = await asyncio.to_thread(
-                openai.ChatCompletion.create,
+                self.client.chat.completions.create,
                 model="gpt-4",
                 messages=messages,
                 max_tokens=1000,
-                temperature=0.7,
-                stream=False
+                temperature=0.7
             )
             
             ai_response = response.choices[0].message.content
@@ -67,9 +77,12 @@ Instructions:
     
     async def generate_summary(self, text: str, max_length: int = 200) -> str:
         """Generate a summary of the provided text"""
+        if not self.client:
+            return "AI service not available for summarization."
+            
         try:
             response = await asyncio.to_thread(
-                openai.ChatCompletion.create,
+                self.client.chat.completions.create,
                 model="gpt-3.5-turbo",
                 messages=[
                     {
@@ -89,9 +102,12 @@ Instructions:
     
     async def extract_keywords(self, text: str, max_keywords: int = 10) -> List[str]:
         """Extract keywords from text"""
+        if not self.client:
+            return []
+            
         try:
             response = await asyncio.to_thread(
-                openai.ChatCompletion.create,
+                self.client.chat.completions.create,
                 model="gpt-3.5-turbo",
                 messages=[
                     {
@@ -110,5 +126,3 @@ Instructions:
         except Exception as e:
             print(f"Error extracting keywords: {e}")
             return []
-
-
