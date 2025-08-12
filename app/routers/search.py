@@ -1,6 +1,7 @@
 import json
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, HTTPException
+from datetime import datetime, date
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 from app.database import get_db
@@ -17,6 +18,9 @@ async def search_documents(
     q: str = Query(..., description="Search query"),
     limit: int = Query(10, ge=1, le=50, description="Number of results to return"),
     search_type: str = Query("hybrid", description="Search type: text, semantic, or hybrid"),
+    file_type: Optional[str] = Query(None, description="Filter by type: pdf|word|text|image|other"),
+    date_from: Optional[date] = Query(None, description="Filter by created_at from (YYYY-MM-DD)"),
+    date_to: Optional[date] = Query(None, description="Filter by created_at to (YYYY-MM-DD)"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -31,17 +35,34 @@ async def search_documents(
     
     results = []
     
+    # Build optional filters
+    created_from_dt = datetime.combine(date_from, datetime.min.time()) if date_from else None
+    created_to_dt = datetime.combine(date_to, datetime.max.time()) if date_to else None
+
+    def _mime_types_for_category(category: str) -> List[str]:
+        mapping = {
+            'pdf': ['application/pdf'],
+            'word': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+            'text': ['text/plain', 'text/markdown'],
+            'image': ['image/jpeg', 'image/png', 'image/gif'],
+            'other': [],
+        }
+        return mapping.get((category or '').lower(), [])
+
     if search_type in ["text", "hybrid"]:
         # Text-based search
-        text_results = db.query(Document).filter(
-            and_(
-                Document.user_id == current_user.id,
-                or_(
-                    Document.original_filename.contains(q),
-                    Document.content.contains(q)
-                )
-            )
-        ).limit(limit).all()
+        conditions = [Document.user_id == current_user.id]
+        conditions.append(or_(Document.original_filename.contains(q), Document.content.contains(q)))
+        if file_type:
+            mimes = _mime_types_for_category(file_type)
+            if mimes:
+                conditions.append(Document.file_type.in_(mimes))
+        if created_from_dt:
+            conditions.append(Document.created_at >= created_from_dt)
+        if created_to_dt:
+            conditions.append(Document.created_at <= created_to_dt)
+
+        text_results = db.query(Document).filter(and_(*conditions)).limit(limit).all()
         
         for doc in text_results:
             # Find relevant snippet
@@ -73,6 +94,15 @@ async def search_documents(
                     ).first()
                     
                     if chunk and chunk.document:
+                        # Apply file type and date filters for semantic results as well
+                        if file_type:
+                            mimes = _mime_types_for_category(file_type)
+                            if mimes and chunk.document.file_type not in mimes:
+                                continue
+                        if created_from_dt and chunk.document.created_at < created_from_dt:
+                            continue
+                        if created_to_dt and chunk.document.created_at > created_to_dt:
+                            continue
                         # Check if document already in results
                         existing = next((r for r in results if r.document_id == chunk.document.id), None)
                         if not existing:
