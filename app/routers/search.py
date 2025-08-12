@@ -88,10 +88,13 @@ async def search_documents(
                 )
                 
                 for result in vector_results:
-                    chunk_id = result['id']
-                    chunk = db.query(DocumentChunk).filter(
-                        DocumentChunk.id == chunk_id
-                    ).first()
+                    raw_id = result.get('id')
+                    try:
+                        chunk_id = int(raw_id)
+                    except (TypeError, ValueError):
+                        # Skip invalid IDs (e.g., 'None' from legacy vectors)
+                        continue
+                    chunk = db.query(DocumentChunk).filter(DocumentChunk.id == chunk_id).first()
                     
                     if chunk and chunk.document:
                         # Apply file type and date filters for semantic results as well
@@ -114,6 +117,8 @@ async def search_documents(
                             ))
         except Exception as e:
             print(f"Error in semantic search: {e}")
+            # Ensure session is usable after DB errors
+            db.rollback()
     
     # Update search query with results count
     search_query.results_count = len(results)
