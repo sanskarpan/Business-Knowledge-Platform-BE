@@ -125,10 +125,12 @@ async def send_message(
             
             # Get the actual document chunks
             for result in search_results:
-                chunk_id = result['id']
-                chunk = db.query(DocumentChunk).filter(
-                    DocumentChunk.id == chunk_id
-                ).first()
+                raw_id = result.get('id')
+                try:
+                    chunk_id = int(raw_id)
+                except (TypeError, ValueError):
+                    continue
+                chunk = db.query(DocumentChunk).filter(DocumentChunk.id == chunk_id).first()
                 
                 if chunk:
                     relevant_chunks.append(chunk.content)
@@ -192,6 +194,7 @@ async def send_message(
         
     except Exception as e:
         print(f"Error processing message: {e}")
+        db.rollback()
         # Store error response
         error_message = ChatMessage(
             session_id=session_id,
@@ -269,15 +272,33 @@ async def stream_message(
             yield f"data: {json.dumps({'type': 'start', 'content': ''})}\n\n"
             
             # Process message (similar to above)
-            response = await send_message(session_id, message, current_user, db)
-            
+            # Reuse generation but avoid duplicate DB writes by calling AI service directly
+            query_embedding = await vector_service.create_embedding(message.content)
+            relevant_chunks = []
+            if query_embedding:
+                results = await vector_service.search_similar(query_embedding, top_k=5, filter_dict={"user_id": current_user.id})
+                for r in results:
+                    try:
+                        cid = int(r.get('id'))
+                    except (TypeError, ValueError):
+                        continue
+                    chunk = db.query(DocumentChunk).filter(DocumentChunk.id == cid).first()
+                    if chunk:
+                        relevant_chunks.append(chunk.content)
+
+            recent = db.query(ChatMessage).filter(ChatMessage.session_id == session_id).order_by(ChatMessage.timestamp.desc()).limit(10).all()
+            history = [{"role": m.role, "content": m.content} for m in reversed(recent)]
+            ai_data = await ai_service.generate_response(query=message.content, context_chunks=relevant_chunks, conversation_history=history)
+            text = ai_data.get("response", "")
+            # Tokenize by words to stream
+            words = text.split()
             # Stream the response word by word for demonstration
-            words = response.message.split()
+            
             for word in words:
                 yield f"data: {json.dumps({'type': 'token', 'content': word + ' '})}\n\n"
                 await asyncio.sleep(0.1)  # Simulate streaming delay
             
-            yield f"data: {json.dumps({'type': 'end', 'sources': response.sources})}\n\n"
+            yield f"data: {json.dumps({'type': 'end', 'sources': []})}\n\n"
             
         except Exception as e:
             yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
