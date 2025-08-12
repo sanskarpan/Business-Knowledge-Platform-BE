@@ -70,11 +70,11 @@ async def upload_document(
     if text_content and text_content.strip():
         chunks = chunk_text(text_content)
         for i, chunk in enumerate(chunks):
-            # Create embedding using vector service
             try:
+                # Create embedding (may fail)
                 embedding = await vector_service.create_embedding(chunk)
-                
-                # Store chunk in database
+
+                # Create and persist chunk
                 db_chunk = DocumentChunk(
                     document_id=db_document.id,
                     content=chunk,
@@ -82,9 +82,11 @@ async def upload_document(
                     position=i
                 )
                 db.add(db_chunk)
-                
-                # Store in Pinecone if embedding was created
-                if embedding:
+                # Ensure db_chunk.id is available before using it
+                db.flush()
+
+                # Store vector only if embedding exists and id is available
+                if embedding and db_chunk.id is not None:
                     vector_data = {
                         'id': str(db_chunk.id),
                         'values': embedding,
@@ -96,10 +98,11 @@ async def upload_document(
                         }
                     }
                     await vector_service.store_vectors([vector_data])
-                    
+
             except Exception as e:
-                print(f"Error creating embedding for chunk {i}: {e}")
-                # Store chunk without embedding
+                print(f"Error processing chunk {i}: {e}")
+                db.rollback()
+                # Re-add minimal chunk without embedding
                 db_chunk = DocumentChunk(
                     document_id=db_document.id,
                     content=chunk,
@@ -107,7 +110,8 @@ async def upload_document(
                     position=i
                 )
                 db.add(db_chunk)
-        
+                db.flush()
+
         db.commit()
     
     # Log activity
