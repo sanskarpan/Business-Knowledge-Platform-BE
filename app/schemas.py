@@ -99,4 +99,3 @@ class DocumentAnalytics(BaseModel):
     total_documents: int
     documents_by_type: dict
     recent_uploads: List[dict]
-    
