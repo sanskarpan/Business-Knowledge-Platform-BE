@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 from app.database import engine, Base
 from app.routers import auth, documents, chat, search
+from app.routers import analytics as analytics_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -17,7 +18,12 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +40,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 app.include_router(documents.router, prefix="/api/documents", tags=["documents"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 app.include_router(search.router, prefix="/api/search", tags=["search"])
+app.include_router(analytics_router.router, prefix="/api/analytics", tags=["analytics"])
 
 @app.get("/")
 async def root():
