@@ -267,3 +267,4 @@ def _simplify_file_type(mime_type: str) -> str:
     return type_mapping.get(mime_type, "Other")
 
 
+
