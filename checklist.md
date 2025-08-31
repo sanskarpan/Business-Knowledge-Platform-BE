@@ -216,7 +216,7 @@
 
 ### **Performance Requirements**
 - [X] AI responses under 5 seconds
-- [ ] Document upload processing under 30 seconds for 10MB files
+- [X] Document upload processing under 30 seconds for 10MB files
 - [ ] Application loads within 3 seconds
 - [ ] Search results returned within 2 seconds
 
