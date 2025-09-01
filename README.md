@@ -1,6 +1,6 @@
 # Knowledge Platform Backend
 
-A production-ready FastAPI backend for AI-powered document management and conversational knowledge retrieval.
+This repository is a FastAPI backend for AI-powered document management and conversational knowledge retrieval.
 
 ## Overview
 
