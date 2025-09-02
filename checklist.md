@@ -130,7 +130,7 @@
 - [ ] Document technology choices and LLM usage
 
 #### Deployment
-- [ ] Set up production environment variables
+- [X] Set up production environment variables
 - [ ] Deploy backend (Railway, Heroku, or AWS)
 - [ ] Deploy frontend (Vercel, Netlify)
 - [ ] Configure domain and SSL
