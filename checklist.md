@@ -131,7 +131,7 @@
 
 #### Deployment
 - [X] Set up production environment variables
-- [ ] Deploy backend (Railway, Heroku, or AWS)
+- [X] Deploy backend (Railway, Heroku, or AWS)
 - [ ] Deploy frontend (Vercel, Netlify)
 - [ ] Configure domain and SSL
 - [ ] Test production deployment
