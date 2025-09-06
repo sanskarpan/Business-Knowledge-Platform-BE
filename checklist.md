@@ -132,7 +132,7 @@
 #### Deployment
 - [X] Set up production environment variables
 - [X] Deploy backend (Railway, Heroku, or AWS)
-- [ ] Deploy frontend (Vercel, Netlify)
+- [X] Deploy frontend (Vercel, Netlify)
 - [ ] Configure domain and SSL
 - [ ] Test production deployment
 - [ ] Create demo video (5 minutes)
