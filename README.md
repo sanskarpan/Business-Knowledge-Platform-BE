@@ -266,7 +266,6 @@ python -c "from app.services.vector_service import VectorService; vs = VectorSer
 
 **Slow API Response**
 - Check database query performance
-- Monitor OpenAI API response times
 - Verify vector search index status
 - Review file processing performance
 
